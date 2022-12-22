@@ -17,10 +17,10 @@ go get entgo.io/contrib/entgql
 go run -mod=mod entgo.io/ent/cmd/ent init Todo
 
 # 定義欄位,Fields(), Annotations()
-open ./ent/schema/todo.go
+code ./ent/schema/todo.go
 
 # 定義CRUD邏輯
-open ./graph/schema.resolvers.go
+code ./graph/schema.resolvers.go
 
 # 定義欄位產生相關檔案
 go generate ./ent
@@ -44,19 +44,20 @@ go run server.go
 rm ./server.go
 
 # 修改gqlgen.yml設定檔
-open ./gqlgen.yml
+code ./gqlgen.yml
 
 # 修改resolver.go,加入ent.Client,NewSchema
-open ./resolver.go
+code ./resolver.go
 
 # 建立generate腳本
-open ./generate.go
+code ./generate.go
 
 # 產生相關檔案
 go generate .
 
 # 建立main.go
-touch main.go & open main.go
+touch ./main.go
+code ./main.go
 
 # 安裝mysql連線套件
 go get github.com/go-sql-driver/mysql
@@ -64,5 +65,19 @@ go get github.com/go-sql-driver/mysql
 # 檢查套件相依
 go mod tidy
 
+# 啓動服務
+go run main.go
+
+# 建立todo.graphqls,新增及修改
+touch ./graph/todo.graphqls
+code ./graph/todo.graphqls
+
+# 產生相關檔案,./graph/todo.resolvers.go
+go generate .
+
+# 填加邏輯,查詢單筆/新增/修改
+code ./graph/todo.resolvers.go
+
+# 啓動服務,檢查:查詢單筆/新增/修改的結果
 go run main.go
 ```
