@@ -31,6 +31,7 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, id int, input ent.Upd
 func (r *mutationResolver) DeleteTodo(ctx context.Context, id int) (bool, error) {
 	// panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
 
+	// 刪除一筆資料
 	if err := r.client.Todo.DeleteOneID(id).Exec(ctx); err != nil {
 		return false, err
 	}
