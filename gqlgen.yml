@@ -3,9 +3,10 @@ schema:
   - graph/*.graphqls
 
 # Where should the generated server code go?
+# 建立generated資料夾,package設定為generated
 exec:
-  filename: graph/generated.go
-  package: graph
+  filename: graph/generated/generated.go
+  package: generated
 
 # Uncomment to enable federation
 # federation:
@@ -13,9 +14,10 @@ exec:
 #   package: graph
 
 # Where should any generated models go?
-model:
-  filename: graph/model/models_gen.go
-  package: model
+# 使用ent所以註解
+# model:
+#   filename: graph/model/models_gen.go
+#   package: model
 
 # Where should the resolver implementations go?
 resolver:
@@ -42,22 +44,31 @@ resolver:
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "go-ent-gqlgen/graph/model"
+  - "go-ent-gqlgen/ent"
+  - "go-ent-gqlgen/ent/todo"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
 # The first line in each type will be used as defaults for resolver arguments and
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
+# 使用IntID
+
 models:
   ID:
     model:
-      - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
-  Int:
+      - github.com/99designs/gqlgen/graphql.IntID
+      # - github.com/99designs/gqlgen/graphql.ID
+      # - github.com/99designs/gqlgen/graphql.Int
+      # - github.com/99designs/gqlgen/graphql.Int64
+      # - github.com/99designs/gqlgen/graphql.Int32
+  # Int:
+  #   model:
+  #     - github.com/99designs/gqlgen/graphql.Int
+  #     - github.com/99designs/gqlgen/graphql.Int64
+  #     - github.com/99designs/gqlgen/graphql.Int32
+
+  # Relay Node Interface功能使用ent.Noder
+  Node:
     model:
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
+      - go-ent-gqlgen/ent.Noder

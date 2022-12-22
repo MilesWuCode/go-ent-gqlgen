@@ -5,6 +5,7 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 )
 
@@ -44,4 +45,15 @@ func (Todo) Fields() []ent.Field {
 // Edges of the Todo.
 func (Todo) Edges() []ent.Edge {
 	return nil
+}
+
+func (Todo) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		// 查詢
+		entgql.QueryField(),
+		// 分頁
+		entgql.RelayConnection(),
+		// 新增,修改
+		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
+	}
 }

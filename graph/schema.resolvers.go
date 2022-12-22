@@ -6,25 +6,41 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"go-ent-gqlgen/graph/model"
+	"go-ent-gqlgen/ent"
+	"go-ent-gqlgen/graph/generated"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// Node is the resolver for the node field.
+func (r *queryResolver) Node(ctx context.Context, id int) (ent.Noder, error) {
+	// panic(fmt.Errorf("not implemented: Node - node"))
+
+	// 填加
+	return r.client.Noder(ctx, id)
+}
+
+// Nodes is the resolver for the nodes field.
+func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, error) {
+	// panic(fmt.Errorf("not implemented: Nodes - nodes"))
+
+	// 填加
+	return r.client.Noders(ctx, ids)
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+func (r *queryResolver) Todos(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TodoOrder, where *ent.TodoWhereInput) (*ent.TodoConnection, error) {
+	// panic(fmt.Errorf("not implemented: Todos - todos"))
+
+	// 全部
+	// return r.client.Todo.Query().All(ctx)
+
+	// 填加entgql.RelayConnection(),才能使用分頁
+	return r.client.Todo.Query().
+		Paginate(ctx, after, first, before, last,
+			ent.WithTodoOrder(orderBy),
+		)
 }
 
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
-type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
