@@ -27,6 +27,17 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, id int, input ent.Upd
 	return r.client.Todo.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
+// DeleteTodo is the resolver for the deleteTodo field.
+func (r *mutationResolver) DeleteTodo(ctx context.Context, id int) (bool, error) {
+	// panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
+
+	if err := r.client.Todo.DeleteOneID(id).Exec(ctx); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // Todo is the resolver for the todo field.
 func (r *queryResolver) Todo(ctx context.Context, id int) (*ent.Todo, error) {
 	// panic(fmt.Errorf("not implemented: Todo - todo"))
