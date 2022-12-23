@@ -55,6 +55,9 @@ code ./generate.go
 # 產生相關檔案
 go generate .
 
+# 刪除不必要的檔案
+rm -rf ./graph/model
+
 # 建立main.go
 touch ./main.go
 code ./main.go
@@ -82,8 +85,6 @@ code ./graph/todo.resolvers.go
 go run main.go
 
 ### 使用 versioned-migration ###
-
-#
 
 # 關閉自動migration功能,client.Schema.Create()
 open ./main.go
