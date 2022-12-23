@@ -45,6 +45,7 @@
     }
   }
 }
+
 # 多筆查詢
 {
   nodes(ids: ["3", "4", "999"]) {
@@ -56,6 +57,7 @@
     }
   }
 }
+
 # 新增
 mutation {
   createTodo(input: { text: "abc123", status: IN_PROGRESS }) {
