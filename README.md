@@ -1,5 +1,7 @@
 # go ent gqlgen
 
+## gql 查詢範例
+
 ```gql
 # 分頁查詢
 {
@@ -25,25 +27,35 @@
 
 # 單筆查詢
 {
-  todos(first: 3, after: null) {
-    edges {
-      cursor
-      node {
-        id
-        text
-        status
-        createdAt
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
-      startCursor
-      hasPreviousPage
+  todo(id: "3") {
+    id
+    text
+    status
+    createdAt
+  }
+}
+# or
+{
+  node(id: "3") {
+    ... on Todo {
+      id
+      text
+      status
+      createdAt
     }
   }
 }
-
+# 多筆查詢
+{
+  nodes(ids: ["3", "4", "999"]) {
+    ... on Todo {
+      id
+      text
+      status
+      createdAt
+    }
+  }
+}
 # 新增
 mutation {
   createTodo(input: { text: "abc123", status: IN_PROGRESS }) {
@@ -65,4 +77,7 @@ mutation {
 }
 
 # 刪除
+mutation {
+  deleteTodo(id: "6")
+}
 ```
