@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"go-ent-gqlgen/ent"
-	"go-ent-gqlgen/ent/migrate"
 	"go-ent-gqlgen/graph"
 	"log"
 	"net/http"
@@ -41,12 +39,12 @@ func main() {
 	defer client.Close()
 
 	// 自動migration,有版本控制建議關閉
-	if err := client.Schema.Create(
-		context.Background(),
-		migrate.WithGlobalUniqueID(true),
-	); err != nil {
-		log.Fatal("running schema migration", err)
-	}
+	// if err := client.Schema.Create(
+	// 	context.Background(),
+	// 	migrate.WithGlobalUniqueID(true),
+	// ); err != nil {
+	// 	log.Fatal("running schema migration", err)
+	// }
 
 	// 預設埠
 	port := os.Getenv("PORT")

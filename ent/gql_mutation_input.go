@@ -12,6 +12,7 @@ type CreateTodoInput struct {
 	Text      string
 	Status    *todo.Status
 	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }
 
 // Mutate applies the CreateTodoInput on the TodoMutation builder.
@@ -23,6 +24,9 @@ func (i *CreateTodoInput) Mutate(m *TodoMutation) {
 	if v := i.CreatedAt; v != nil {
 		m.SetCreatedAt(*v)
 	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateTodoInput on the TodoCreate builder.
@@ -33,8 +37,9 @@ func (c *TodoCreate) SetInput(i CreateTodoInput) *TodoCreate {
 
 // UpdateTodoInput represents a mutation input for updating todos.
 type UpdateTodoInput struct {
-	Text   *string
-	Status *todo.Status
+	Text      *string
+	Status    *todo.Status
+	UpdatedAt *time.Time
 }
 
 // Mutate applies the UpdateTodoInput on the TodoMutation builder.
@@ -44,6 +49,9 @@ func (i *UpdateTodoInput) Mutate(m *TodoMutation) {
 	}
 	if v := i.Status; v != nil {
 		m.SetStatus(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
 	}
 }
 

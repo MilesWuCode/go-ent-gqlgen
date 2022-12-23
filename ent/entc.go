@@ -29,7 +29,16 @@ func main() {
 	opts := []entc.Option{
 		entc.Extensions(ex),
 	}
-	if err := entc.Generate("./ent/schema", &gen.Config{}, opts...); err != nil {
+
+	// 原本未使用versioned-migrations
+	// if err := entc.Generate("./ent/schema", &gen.Config{}, opts...); err != nil {
+	// 	log.Fatalf("running ent codegen: %v", err)
+	// }
+
+	// 使用versioned-migrations
+	if err := entc.Generate("./ent/schema", &gen.Config{
+		Features: []gen.Feature{gen.FeatureVersionedMigration},
+	}, opts...); err != nil {
 		log.Fatalf("running ent codegen: %v", err)
 	}
 }

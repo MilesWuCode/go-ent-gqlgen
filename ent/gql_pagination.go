@@ -469,6 +469,16 @@ var (
 			}
 		},
 	}
+	// TodoOrderFieldUpdatedAt orders Todo by updated_at.
+	TodoOrderFieldUpdatedAt = &TodoOrderField{
+		field: todo.FieldUpdatedAt,
+		toCursor: func(t *Todo) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.UpdatedAt,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -481,6 +491,8 @@ func (f TodoOrderField) String() string {
 		str = "STATUS"
 	case todo.FieldCreatedAt:
 		str = "CREATED_AT"
+	case todo.FieldUpdatedAt:
+		str = "UPDATED_AT"
 	}
 	return str
 }
@@ -503,6 +515,8 @@ func (f *TodoOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *TodoOrderFieldStatus
 	case "CREATED_AT":
 		*f = *TodoOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *TodoOrderFieldUpdatedAt
 	default:
 		return fmt.Errorf("%s is not a valid TodoOrderField", str)
 	}

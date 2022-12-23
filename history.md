@@ -80,4 +80,50 @@ code ./graph/todo.resolvers.go
 
 # 啓動服務,檢查:查詢單筆/新增/修改的結果
 go run main.go
+
+### 使用 versioned-migration ###
+
+#
+
+# 關閉自動migration功能,client.Schema.Create()
+open ./main.go
+
+# 修改entc.go,加入Features: []gen.Feature{gen.FeatureVersionedMigration},
+open ./ent/entc.go
+
+# 建立自定義生成
+touch ./ent/migrate/main.go
+open ./ent/migrate/main.go
+
+# 建立空資料夾migrations,存放sql記錄檔
+mkdir ./ent/migrate/migrations
+
+# 執行ent/migrate/main.go,自動建立xxx_create_todos.sql記錄檔,atlas.sum校驗檔
+go run -mod=mod ent/migrate/main.go create_todos
+
+# 執行lint,用來驗證sql記錄檔與專案生成代碼是否有差異
+atlas migrate lint \
+ --dev-url="mysql://root:password@localhost:3306/test" \
+  --dir="file://ent/migrate/migrations" \
+  --latest=1
+
+# 新增一個欄位updated_at
+open ./ent/schema/todo.go
+
+# 自動建立xxx_add_updated_at_to_todos.sql記錄檔
+go run -mod=mod ent/migrate/main.go add_updated_at_to_todos
+
+# 執行lint,顯示出updated_at欄位差異
+atlas migrate lint \
+ --dev-url="mysql://root:password@localhost:3306/test" \
+  --dir="file://ent/migrate/migrations" \
+  --latest=1
+
+# 執行apply更新資料庫,因為是中途才用版控資料庫所以加入--baseline xxx
+# xxx為./ent/migrate/migrations/20221223061143_create_todos.sql前面日期
+# 之後的版控不需要--baseline
+atlas migrate apply \
+  --dir "file://ent/migrate/migrations" \
+  --url mysql://root:password@localhost:3306/go_ent_gqlgen \
+  --baseline 20221223061143
 ```
