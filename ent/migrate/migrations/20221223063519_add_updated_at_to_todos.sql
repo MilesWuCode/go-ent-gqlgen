@@ -1,2 +1,2 @@
 -- modify "todos" table
-ALTER TABLE `todos` ADD COLUMN `updated_at` timestamp NOT NULL;
+ALTER TABLE `todos` ADD COLUMN `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
