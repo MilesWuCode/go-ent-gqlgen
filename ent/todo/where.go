@@ -7,360 +7,283 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
 func ID(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Todo(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Todo(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Todo(sql.FieldLTE(FieldID, id))
 }
 
 // Text applies equality check predicate on the "text" field. It's identical to TextEQ.
 func Text(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldText, v))
+}
+
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldUserID, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // TextEQ applies the EQ predicate on the "text" field.
 func TextEQ(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldText, v))
 }
 
 // TextNEQ applies the NEQ predicate on the "text" field.
 func TextNEQ(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldNEQ(FieldText, v))
 }
 
 // TextIn applies the In predicate on the "text" field.
 func TextIn(vs ...string) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldText), v...))
-	})
+	return predicate.Todo(sql.FieldIn(FieldText, vs...))
 }
 
 // TextNotIn applies the NotIn predicate on the "text" field.
 func TextNotIn(vs ...string) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldText), v...))
-	})
+	return predicate.Todo(sql.FieldNotIn(FieldText, vs...))
 }
 
 // TextGT applies the GT predicate on the "text" field.
 func TextGT(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldGT(FieldText, v))
 }
 
 // TextGTE applies the GTE predicate on the "text" field.
 func TextGTE(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldGTE(FieldText, v))
 }
 
 // TextLT applies the LT predicate on the "text" field.
 func TextLT(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldLT(FieldText, v))
 }
 
 // TextLTE applies the LTE predicate on the "text" field.
 func TextLTE(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldLTE(FieldText, v))
 }
 
 // TextContains applies the Contains predicate on the "text" field.
 func TextContains(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldContains(FieldText, v))
 }
 
 // TextHasPrefix applies the HasPrefix predicate on the "text" field.
 func TextHasPrefix(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldHasPrefix(FieldText, v))
 }
 
 // TextHasSuffix applies the HasSuffix predicate on the "text" field.
 func TextHasSuffix(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldHasSuffix(FieldText, v))
 }
 
 // TextEqualFold applies the EqualFold predicate on the "text" field.
 func TextEqualFold(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldEqualFold(FieldText, v))
 }
 
 // TextContainsFold applies the ContainsFold predicate on the "text" field.
 func TextContainsFold(v string) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldText), v))
-	})
+	return predicate.Todo(sql.FieldContainsFold(FieldText, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v Status) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStatus), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
 func StatusNEQ(v Status) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStatus), v))
-	})
+	return predicate.Todo(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
 func StatusIn(vs ...Status) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStatus), v...))
-	})
+	return predicate.Todo(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStatus), v...))
-	})
+	return predicate.Todo(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldUserID, v))
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.Todo {
+	return predicate.Todo(sql.FieldNEQ(FieldUserID, v))
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.Todo {
+	return predicate.Todo(sql.FieldIn(FieldUserID, vs...))
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.Todo {
+	return predicate.Todo(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Todo(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Todo(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Todo(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
 func UpdatedAtNEQ(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Todo(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Todo {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Todo(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtGT applies the GT predicate on the "updated_at" field.
 func UpdatedAtGT(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldGT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
 func UpdatedAtGTE(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLT applies the LT predicate on the "updated_at" field.
 func UpdatedAtLT(v time.Time) predicate.Todo {
-	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Todo(sql.FieldLT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Todo {
+	return predicate.Todo(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Todo {
 	return predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Todo {
+	return predicate.Todo(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(UserInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

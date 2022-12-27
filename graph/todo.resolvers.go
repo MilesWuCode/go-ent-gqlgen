@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"go-ent-gqlgen/ent"
 	"go-ent-gqlgen/graph/generated"
 )
@@ -45,6 +46,12 @@ func (r *queryResolver) Todo(ctx context.Context, id int) (*ent.Todo, error) {
 
 	// 用id查一筆資料
 	return r.client.Todo.Get(ctx, id)
+}
+
+// Company is the resolver for the company field.
+func (r *todoResolver) Company(ctx context.Context, obj *ent.Todo) (string, error) {
+	// panic(fmt.Errorf("not implemented: Company - company"))
+	return fmt.Sprintf("%v: %v", obj.ID, obj.Text), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -4,9 +4,9 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"go-ent-gqlgen/ent/todo"
+	"go-ent-gqlgen/ent/user"
 	"sync"
 	"sync/atomic"
 
@@ -21,81 +21,14 @@ import (
 
 // Noder wraps the basic Node method.
 type Noder interface {
-	Node(context.Context) (*Node, error)
+	IsNode()
 }
 
-// Node in the graph.
-type Node struct {
-	ID     int      `json:"id,omitempty"`     // node id.
-	Type   string   `json:"type,omitempty"`   // node type.
-	Fields []*Field `json:"fields,omitempty"` // node fields.
-	Edges  []*Edge  `json:"edges,omitempty"`  // node edges.
-}
+// IsNode implements the Node interface check for GQLGen.
+func (n *Todo) IsNode() {}
 
-// Field of a node.
-type Field struct {
-	Type  string `json:"type,omitempty"`  // field type.
-	Name  string `json:"name,omitempty"`  // field name (as in struct).
-	Value string `json:"value,omitempty"` // stringified value.
-}
-
-// Edges between two nodes.
-type Edge struct {
-	Type string `json:"type,omitempty"` // edge type.
-	Name string `json:"name,omitempty"` // edge name.
-	IDs  []int  `json:"ids,omitempty"`  // node ids (where this edge point to).
-}
-
-func (t *Todo) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     t.ID,
-		Type:   "Todo",
-		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 0),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(t.Text); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "text",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(t.Status); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "todo.Status",
-		Name:  "status",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(t.CreatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[2] = &Field{
-		Type:  "time.Time",
-		Name:  "created_at",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(t.UpdatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[3] = &Field{
-		Type:  "time.Time",
-		Name:  "updated_at",
-		Value: string(buf),
-	}
-	return node, nil
-}
-
-func (c *Client) Node(ctx context.Context, id int) (*Node, error) {
-	n, err := c.Noder(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return n.Node(ctx)
-}
+// IsNode implements the Node interface check for GQLGen.
+func (n *User) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -159,6 +92,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Todo.Query().
 			Where(todo.ID(id))
 		query, err := query.CollectFields(ctx, "Todo")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case user.Table:
+		query := c.User.Query().
+			Where(user.ID(id))
+		query, err := query.CollectFields(ctx, "User")
 		if err != nil {
 			return nil, err
 		}
@@ -244,6 +189,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Todo.Query().
 			Where(todo.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Todo")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case user.Table:
+		query := c.User.Query().
+			Where(user.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "User")
 		if err != nil {
 			return nil, err
 		}

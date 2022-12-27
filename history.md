@@ -8,10 +8,10 @@ git init -b main
 go mod init go-ent-gqlgen
 
 # 安裝ent,ORM工具
-go get entgo.io/ent/cmd/ent
+go get entgo.io/ent/cmd/ent@master
 
 # 安裝entgql,ent的擴展和工具集合
-go get entgo.io/contrib/entgql
+go get entgo.io/contrib@master
 
 # 建立Todo的Model
 go run -mod=mod entgo.io/ent/cmd/ent init Todo
@@ -127,4 +127,36 @@ atlas migrate apply \
   --dir "file://ent/migrate/migrations" \
   --url mysql://root:password@localhost:3306/go_ent_gqlgen \
   --baseline 20221223061143
+
+### user 與 todo 關係 ###
+
+# 建立user
+go run -mod=mod entgo.io/ent/cmd/ent init User
+
+# user欄位Fields()和關係Edges()
+code ./ent/schema/user.go
+
+# todo關係Edges()
+code ./ent/schema/todo.go
+
+# 產生相關檔案
+go generate .
+
+# 生成SQL
+go run -mod=mod ent/migrate/main.go create_users
+
+# 檢查SQL
+atlas migrate lint \
+ --dev-url="mysql://root:password@localhost:3306/test" \
+  --dir="file://ent/migrate/migrations" \
+  --latest=1
+
+# 若有缺預設值,修改完後執行hash
+atlas migrate hash \
+  --dir "file://ent/migrate/migrations"
+
+# 執行apply更新資料庫
+atlas migrate apply \
+  --dir "file://ent/migrate/migrations" \
+  --url mysql://root:password@localhost:3306/go_ent_gqlgen
 ```

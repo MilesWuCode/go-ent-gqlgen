@@ -13,6 +13,7 @@ type CreateTodoInput struct {
 	Status    *todo.Status
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
+	UserID    int
 }
 
 // Mutate applies the CreateTodoInput on the TodoMutation builder.
@@ -27,6 +28,7 @@ func (i *CreateTodoInput) Mutate(m *TodoMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
+	m.SetUserID(i.UserID)
 }
 
 // SetInput applies the change-set in the CreateTodoInput on the TodoCreate builder.
@@ -40,6 +42,8 @@ type UpdateTodoInput struct {
 	Text      *string
 	Status    *todo.Status
 	UpdatedAt *time.Time
+	ClearUser bool
+	UserID    *int
 }
 
 // Mutate applies the UpdateTodoInput on the TodoMutation builder.
@@ -53,6 +57,12 @@ func (i *UpdateTodoInput) Mutate(m *TodoMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
+	if i.ClearUser {
+		m.ClearUser()
+	}
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
+	}
 }
 
 // SetInput applies the change-set in the UpdateTodoInput on the TodoUpdate builder.
@@ -63,6 +73,82 @@ func (c *TodoUpdate) SetInput(i UpdateTodoInput) *TodoUpdate {
 
 // SetInput applies the change-set in the UpdateTodoInput on the TodoUpdateOne builder.
 func (c *TodoUpdateOne) SetInput(i UpdateTodoInput) *TodoUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateUserInput represents a mutation input for creating users.
+type CreateUserInput struct {
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	TodoID    *int
+}
+
+// Mutate applies the CreateUserInput on the UserMutation builder.
+func (i *CreateUserInput) Mutate(m *UserMutation) {
+	m.SetName(i.Name)
+	m.SetEmail(i.Email)
+	m.SetPassword(i.Password)
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.TodoID; v != nil {
+		m.SetTodoID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateUserInput on the UserCreate builder.
+func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateUserInput represents a mutation input for updating users.
+type UpdateUserInput struct {
+	Name      *string
+	Email     *string
+	Password  *string
+	UpdatedAt *time.Time
+	ClearTodo bool
+	TodoID    *int
+}
+
+// Mutate applies the UpdateUserInput on the UserMutation builder.
+func (i *UpdateUserInput) Mutate(m *UserMutation) {
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Email; v != nil {
+		m.SetEmail(*v)
+	}
+	if v := i.Password; v != nil {
+		m.SetPassword(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearTodo {
+		m.ClearTodo()
+	}
+	if v := i.TodoID; v != nil {
+		m.SetTodoID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateUserInput on the UserUpdate builder.
+func (c *UserUpdate) SetInput(i UpdateUserInput) *UserUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateUserInput on the UserUpdateOne builder.
+func (c *UserUpdateOne) SetInput(i UpdateUserInput) *UserUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

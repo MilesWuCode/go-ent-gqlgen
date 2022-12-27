@@ -5,7 +5,9 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -33,6 +35,12 @@ func (Todo) Fields() []ent.Field {
 				entgql.OrderField("STATUS"),
 			),
 
+		field.Int("user_id").
+			Default(0).
+			Annotations(
+				entgql.OrderField("USER_ID"),
+			),
+
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable().
@@ -51,7 +59,17 @@ func (Todo) Fields() []ent.Field {
 
 // Edges of the Todo.
 func (Todo) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).
+			Ref("todo").
+			Field("user_id").
+			Unique().
+			Required().
+			Annotations(entsql.Annotation{
+				// 用戶刪除時一起刪除
+				OnDelete: entsql.Cascade,
+			}),
+	}
 }
 
 func (Todo) Annotations() []schema.Annotation {

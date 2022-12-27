@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"go-ent-gqlgen/ent/todo"
+	"go-ent-gqlgen/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -40,6 +41,20 @@ func (tc *TodoCreate) SetNillableStatus(t *todo.Status) *TodoCreate {
 	return tc
 }
 
+// SetUserID sets the "user_id" field.
+func (tc *TodoCreate) SetUserID(i int) *TodoCreate {
+	tc.mutation.SetUserID(i)
+	return tc
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableUserID(i *int) *TodoCreate {
+	if i != nil {
+		tc.SetUserID(*i)
+	}
+	return tc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (tc *TodoCreate) SetCreatedAt(t time.Time) *TodoCreate {
 	tc.mutation.SetCreatedAt(t)
@@ -68,6 +83,11 @@ func (tc *TodoCreate) SetNillableUpdatedAt(t *time.Time) *TodoCreate {
 	return tc
 }
 
+// SetUser sets the "user" edge to the User entity.
+func (tc *TodoCreate) SetUser(u *User) *TodoCreate {
+	return tc.SetUserID(u.ID)
+}
+
 // Mutation returns the TodoMutation object of the builder.
 func (tc *TodoCreate) Mutation() *TodoMutation {
 	return tc.mutation
@@ -75,50 +95,8 @@ func (tc *TodoCreate) Mutation() *TodoMutation {
 
 // Save creates the Todo in the database.
 func (tc *TodoCreate) Save(ctx context.Context) (*Todo, error) {
-	var (
-		err  error
-		node *Todo
-	)
 	tc.defaults()
-	if len(tc.hooks) == 0 {
-		if err = tc.check(); err != nil {
-			return nil, err
-		}
-		node, err = tc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*TodoMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = tc.check(); err != nil {
-				return nil, err
-			}
-			tc.mutation = mutation
-			if node, err = tc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(tc.hooks) - 1; i >= 0; i-- {
-			if tc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = tc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, tc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Todo)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from TodoMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Todo, TodoMutation](ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -149,6 +127,10 @@ func (tc *TodoCreate) defaults() {
 		v := todo.DefaultStatus
 		tc.mutation.SetStatus(v)
 	}
+	if _, ok := tc.mutation.UserID(); !ok {
+		v := todo.DefaultUserID
+		tc.mutation.SetUserID(v)
+	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		v := todo.DefaultCreatedAt()
 		tc.mutation.SetCreatedAt(v)
@@ -177,16 +159,25 @@ func (tc *TodoCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Todo.status": %w`, err)}
 		}
 	}
+	if _, ok := tc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Todo.user_id"`)}
+	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Todo.created_at"`)}
 	}
 	if _, ok := tc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Todo.updated_at"`)}
 	}
+	if _, ok := tc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Todo.user"`)}
+	}
 	return nil
 }
 
 func (tc *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
+	if err := tc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := tc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, tc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -196,6 +187,8 @@ func (tc *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
+	tc.mutation.id = &_node.ID
+	tc.mutation.done = true
 	return _node, nil
 }
 
@@ -225,6 +218,26 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.UpdatedAt(); ok {
 		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   todo.UserTable,
+			Columns: []string{todo.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

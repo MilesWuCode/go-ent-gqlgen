@@ -7,3 +7,7 @@ type Mutation {
 extend type Query {
   todo(id: ID!): Todo!
 }
+
+extend type Todo {
+  company: String! #gqlgen:resolver
+}
