@@ -8,8 +8,13 @@ extend type Query {
 }
 
 extend type User {
+  """
+  客製化欄位
+  """
   firstLetter: String!
-  # 自製分頁
+  """
+  自製分頁
+  """
   todoPages(
     after: Cursor
     first: Int
