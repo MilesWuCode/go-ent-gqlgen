@@ -19,10 +19,6 @@ func init() {
 	todoDescText := todoFields[0].Descriptor()
 	// todo.TextValidator is a validator for the "text" field. It is called by the builders before save.
 	todo.TextValidator = todoDescText.Validators[0].(func(string) error)
-	// todoDescUserID is the schema descriptor for user_id field.
-	todoDescUserID := todoFields[2].Descriptor()
-	// todo.DefaultUserID holds the default value on creation for the user_id field.
-	todo.DefaultUserID = todoDescUserID.Default.(int)
 	// todoDescCreatedAt is the schema descriptor for created_at field.
 	todoDescCreatedAt := todoFields[3].Descriptor()
 	// todo.DefaultCreatedAt holds the default value on creation for the created_at field.

@@ -4,7 +4,6 @@ package ent
 
 import (
 	"fmt"
-	"go-ent-gqlgen/ent/todo"
 	"go-ent-gqlgen/ent/user"
 	"strings"
 	"time"
@@ -34,26 +33,24 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Todo holds the value of the todo edge.
-	Todo *Todo `json:"todo,omitempty"`
+	// Todos holds the value of the todos edge.
+	Todos []*Todo `json:"todos,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
+
+	namedTodos map[string][]*Todo
 }
 
-// TodoOrErr returns the Todo value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) TodoOrErr() (*Todo, error) {
+// TodosOrErr returns the Todos value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) TodosOrErr() ([]*Todo, error) {
 	if e.loadedTypes[0] {
-		if e.Todo == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: todo.Label}
-		}
-		return e.Todo, nil
+		return e.Todos, nil
 	}
-	return nil, &NotLoadedError{edge: "todo"}
+	return nil, &NotLoadedError{edge: "todos"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -123,9 +120,9 @@ func (u *User) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryTodo queries the "todo" edge of the User entity.
-func (u *User) QueryTodo() *TodoQuery {
-	return (&UserClient{config: u.config}).QueryTodo(u)
+// QueryTodos queries the "todos" edge of the User entity.
+func (u *User) QueryTodos() *TodoQuery {
+	return (&UserClient{config: u.config}).QueryTodos(u)
 }
 
 // Update returns a builder for updating this User.
@@ -166,6 +163,30 @@ func (u *User) String() string {
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedTodos returns the Todos named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedTodos(name string) ([]*Todo, error) {
+	if u.Edges.namedTodos == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedTodos[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedTodos(name string, edges ...*Todo) {
+	if u.Edges.namedTodos == nil {
+		u.Edges.namedTodos = make(map[string][]*Todo)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedTodos[name] = []*Todo{}
+	} else {
+		u.Edges.namedTodos[name] = append(u.Edges.namedTodos[name], edges...)
+	}
 }
 
 // Users is a parsable slice of User.

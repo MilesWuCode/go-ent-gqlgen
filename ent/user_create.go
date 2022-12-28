@@ -67,23 +67,19 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// SetTodoID sets the "todo" edge to the Todo entity by ID.
-func (uc *UserCreate) SetTodoID(id int) *UserCreate {
-	uc.mutation.SetTodoID(id)
+// AddTodoIDs adds the "todos" edge to the Todo entity by IDs.
+func (uc *UserCreate) AddTodoIDs(ids ...int) *UserCreate {
+	uc.mutation.AddTodoIDs(ids...)
 	return uc
 }
 
-// SetNillableTodoID sets the "todo" edge to the Todo entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableTodoID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetTodoID(*id)
+// AddTodos adds the "todos" edges to the Todo entity.
+func (uc *UserCreate) AddTodos(t ...*Todo) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return uc
-}
-
-// SetTodo sets the "todo" edge to the Todo entity.
-func (uc *UserCreate) SetTodo(t *Todo) *UserCreate {
-	return uc.SetTodoID(t.ID)
+	return uc.AddTodoIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -215,12 +211,12 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := uc.mutation.TodoIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.TodosIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TodoTable,
-			Columns: []string{user.TodoColumn},
+			Table:   user.TodosTable,
+			Columns: []string{user.TodosColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

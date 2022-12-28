@@ -47,14 +47,6 @@ func (tc *TodoCreate) SetUserID(i int) *TodoCreate {
 	return tc
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableUserID(i *int) *TodoCreate {
-	if i != nil {
-		tc.SetUserID(*i)
-	}
-	return tc
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tc *TodoCreate) SetCreatedAt(t time.Time) *TodoCreate {
 	tc.mutation.SetCreatedAt(t)
@@ -126,10 +118,6 @@ func (tc *TodoCreate) defaults() {
 	if _, ok := tc.mutation.Status(); !ok {
 		v := todo.DefaultStatus
 		tc.mutation.SetStatus(v)
-	}
-	if _, ok := tc.mutation.UserID(); !ok {
-		v := todo.DefaultUserID
-		tc.mutation.SetUserID(v)
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		v := todo.DefaultCreatedAt()
@@ -221,7 +209,7 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 	}
 	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   todo.UserTable,
 			Columns: []string{todo.UserColumn},

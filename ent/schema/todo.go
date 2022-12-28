@@ -36,7 +36,6 @@ func (Todo) Fields() []ent.Field {
 			),
 
 		field.Int("user_id").
-			Default(0).
 			Annotations(
 				entgql.OrderField("USER_ID"),
 			),
@@ -61,9 +60,9 @@ func (Todo) Fields() []ent.Field {
 func (Todo) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
-			Ref("todo").
-			Field("user_id").
+			Ref("todos").
 			Unique().
+			Field("user_id").
 			Required().
 			Annotations(entsql.Annotation{
 				// 用戶刪除時一起刪除

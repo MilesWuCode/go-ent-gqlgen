@@ -397,9 +397,9 @@ type UserWhereInput struct {
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 
-	// "todo" edge predicates.
-	HasTodo     *bool             `json:"hasTodo,omitempty"`
-	HasTodoWith []*TodoWhereInput `json:"hasTodoWith,omitempty"`
+	// "todos" edge predicates.
+	HasTodos     *bool             `json:"hasTodos,omitempty"`
+	HasTodosWith []*TodoWhereInput `json:"hasTodosWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -663,23 +663,23 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 		predicates = append(predicates, user.UpdatedAtLTE(*i.UpdatedAtLTE))
 	}
 
-	if i.HasTodo != nil {
-		p := user.HasTodo()
-		if !*i.HasTodo {
+	if i.HasTodos != nil {
+		p := user.HasTodos()
+		if !*i.HasTodos {
 			p = user.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasTodoWith) > 0 {
-		with := make([]predicate.Todo, 0, len(i.HasTodoWith))
-		for _, w := range i.HasTodoWith {
+	if len(i.HasTodosWith) > 0 {
+		with := make([]predicate.Todo, 0, len(i.HasTodosWith))
+		for _, w := range i.HasTodosWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasTodoWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasTodosWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, user.HasTodoWith(with...))
+		predicates = append(predicates, user.HasTodosWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

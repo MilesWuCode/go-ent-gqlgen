@@ -23,7 +23,7 @@ input CreateUserInput {
   createdAt: Time
   """更新日期"""
   updatedAt: Time
-  todoID: ID
+  todoIDs: [ID!]
 }
 """
 Define a Relay Cursor type:
@@ -240,8 +240,9 @@ input UpdateUserInput {
   password: String
   """更新日期"""
   updatedAt: Time
-  todoID: ID
-  clearTodo: Boolean
+  addTodoIDs: [ID!]
+  removeTodoIDs: [ID!]
+  clearTodos: Boolean
 }
 type User implements Node {
   id: ID!
@@ -251,7 +252,7 @@ type User implements Node {
   createdAt: Time!
   """更新日期"""
   updatedAt: Time!
-  todo: Todo
+  todos: [Todo!]
 }
 """A connection to a list of items."""
 type UserConnection {
@@ -347,7 +348,7 @@ input UserWhereInput {
   updatedAtGTE: Time
   updatedAtLT: Time
   updatedAtLTE: Time
-  """todo edge predicates"""
-  hasTodo: Boolean
-  hasTodoWith: [TodoWhereInput!]
+  """todos edge predicates"""
+  hasTodos: Boolean
+  hasTodosWith: [TodoWhereInput!]
 }

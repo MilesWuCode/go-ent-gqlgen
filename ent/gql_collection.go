@@ -107,7 +107,7 @@ func (u *UserQuery) collectField(ctx context.Context, op *graphql.OperationConte
 	path = append([]string(nil), path...)
 	for _, field := range graphql.CollectFields(op, field.Selections, satisfies) {
 		switch field.Name {
-		case "todo":
+		case "todos":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -116,7 +116,9 @@ func (u *UserQuery) collectField(ctx context.Context, op *graphql.OperationConte
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
 			}
-			u.withTodo = query
+			u.WithNamedTodos(alias, func(wq *TodoQuery) {
+				*wq = *query
+			})
 		}
 	}
 	return nil

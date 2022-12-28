@@ -55,14 +55,6 @@ func (tu *TodoUpdate) SetUserID(i int) *TodoUpdate {
 	return tu
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableUserID(i *int) *TodoUpdate {
-	if i != nil {
-		tu.SetUserID(*i)
-	}
-	return tu
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (tu *TodoUpdate) SetUpdatedAt(t time.Time) *TodoUpdate {
 	tu.mutation.SetUpdatedAt(t)
@@ -171,7 +163,7 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   todo.UserTable,
 			Columns: []string{todo.UserColumn},
@@ -187,7 +179,7 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := tu.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   todo.UserTable,
 			Columns: []string{todo.UserColumn},
@@ -247,14 +239,6 @@ func (tuo *TodoUpdateOne) SetNillableStatus(t *todo.Status) *TodoUpdateOne {
 // SetUserID sets the "user_id" field.
 func (tuo *TodoUpdateOne) SetUserID(i int) *TodoUpdateOne {
 	tuo.mutation.SetUserID(i)
-	return tuo
-}
-
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableUserID(i *int) *TodoUpdateOne {
-	if i != nil {
-		tuo.SetUserID(*i)
-	}
 	return tuo
 }
 
@@ -390,7 +374,7 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 	}
 	if tuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   todo.UserTable,
 			Columns: []string{todo.UserColumn},
@@ -406,7 +390,7 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 	}
 	if nodes := tuo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   todo.UserTable,
 			Columns: []string{todo.UserColumn},

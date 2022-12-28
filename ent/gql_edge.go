@@ -4,6 +4,8 @@ package ent
 
 import (
 	"context"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 func (t *Todo) User(ctx context.Context) (*User, error) {
@@ -14,10 +16,14 @@ func (t *Todo) User(ctx context.Context) (*User, error) {
 	return result, err
 }
 
-func (u *User) Todo(ctx context.Context) (*Todo, error) {
-	result, err := u.Edges.TodoOrErr()
-	if IsNotLoaded(err) {
-		result, err = u.QueryTodo().Only(ctx)
+func (u *User) Todos(ctx context.Context) (result []*Todo, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedTodos(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.TodosOrErr()
 	}
-	return result, MaskNotFound(err)
+	if IsNotLoaded(err) {
+		result, err = u.QueryTodos().All(ctx)
+	}
+	return result, err
 }

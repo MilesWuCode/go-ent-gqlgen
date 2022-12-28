@@ -60,8 +60,6 @@ func ValidColumn(column string) bool {
 var (
 	// TextValidator is a validator for the "text" field. It is called by the builders before save.
 	TextValidator func(string) error
-	// DefaultUserID holds the default value on creation for the "user_id" field.
-	DefaultUserID int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

@@ -355,24 +355,24 @@ func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasTodo applies the HasEdge predicate on the "todo" edge.
-func HasTodo() predicate.User {
+// HasTodos applies the HasEdge predicate on the "todos" edge.
+func HasTodos() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, TodoTable, TodoColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TodosTable, TodosColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasTodoWith applies the HasEdge predicate on the "todo" edge with a given conditions (other predicates).
-func HasTodoWith(preds ...predicate.Todo) predicate.User {
+// HasTodosWith applies the HasEdge predicate on the "todos" edge with a given conditions (other predicates).
+func HasTodosWith(preds ...predicate.Todo) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(TodoInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, TodoTable, TodoColumn),
+			sqlgraph.To(TodosInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TodosTable, TodosColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

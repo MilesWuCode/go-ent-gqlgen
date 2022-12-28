@@ -72,8 +72,7 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		// O2O
-		edge.To("todo", Todo.Type).
-			Unique(),
+		edge.To("todos", Todo.Type),
 	}
 }
 

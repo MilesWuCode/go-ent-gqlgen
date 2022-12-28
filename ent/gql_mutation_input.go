@@ -84,7 +84,7 @@ type CreateUserInput struct {
 	Password  string
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
-	TodoID    *int
+	TodoIDs   []int
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
@@ -98,8 +98,8 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
-	if v := i.TodoID; v != nil {
-		m.SetTodoID(*v)
+	if v := i.TodoIDs; len(v) > 0 {
+		m.AddTodoIDs(v...)
 	}
 }
 
@@ -111,12 +111,13 @@ func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 
 // UpdateUserInput represents a mutation input for updating users.
 type UpdateUserInput struct {
-	Name      *string
-	Email     *string
-	Password  *string
-	UpdatedAt *time.Time
-	ClearTodo bool
-	TodoID    *int
+	Name          *string
+	Email         *string
+	Password      *string
+	UpdatedAt     *time.Time
+	ClearTodos    bool
+	AddTodoIDs    []int
+	RemoveTodoIDs []int
 }
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.
@@ -133,11 +134,14 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
-	if i.ClearTodo {
-		m.ClearTodo()
+	if i.ClearTodos {
+		m.ClearTodos()
 	}
-	if v := i.TodoID; v != nil {
-		m.SetTodoID(*v)
+	if v := i.AddTodoIDs; len(v) > 0 {
+		m.AddTodoIDs(v...)
+	}
+	if v := i.RemoveTodoIDs; len(v) > 0 {
+		m.RemoveTodoIDs(v...)
 	}
 }
 

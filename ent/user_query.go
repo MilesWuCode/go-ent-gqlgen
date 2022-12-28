@@ -19,16 +19,17 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
-	inters     []Interceptor
-	predicates []predicate.User
-	withTodo   *TodoQuery
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*User) error
+	limit          *int
+	offset         *int
+	unique         *bool
+	order          []OrderFunc
+	fields         []string
+	inters         []Interceptor
+	predicates     []predicate.User
+	withTodos      *TodoQuery
+	modifiers      []func(*sql.Selector)
+	loadTotal      []func(context.Context, []*User) error
+	withNamedTodos map[string]*TodoQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,8 +66,8 @@ func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
 	return uq
 }
 
-// QueryTodo chains the current query on the "todo" edge.
-func (uq *UserQuery) QueryTodo() *TodoQuery {
+// QueryTodos chains the current query on the "todos" edge.
+func (uq *UserQuery) QueryTodos() *TodoQuery {
 	query := (&TodoClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
@@ -79,7 +80,7 @@ func (uq *UserQuery) QueryTodo() *TodoQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(todo.Table, todo.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, user.TodoTable, user.TodoColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.TodosTable, user.TodosColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,7 +278,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		offset:     uq.offset,
 		order:      append([]OrderFunc{}, uq.order...),
 		predicates: append([]predicate.User{}, uq.predicates...),
-		withTodo:   uq.withTodo.Clone(),
+		withTodos:  uq.withTodos.Clone(),
 		// clone intermediate query.
 		sql:    uq.sql.Clone(),
 		path:   uq.path,
@@ -285,14 +286,14 @@ func (uq *UserQuery) Clone() *UserQuery {
 	}
 }
 
-// WithTodo tells the query-builder to eager-load the nodes that are connected to
-// the "todo" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithTodo(opts ...func(*TodoQuery)) *UserQuery {
+// WithTodos tells the query-builder to eager-load the nodes that are connected to
+// the "todos" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithTodos(opts ...func(*TodoQuery)) *UserQuery {
 	query := (&TodoClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withTodo = query
+	uq.withTodos = query
 	return uq
 }
 
@@ -375,7 +376,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
 		loadedTypes = [1]bool{
-			uq.withTodo != nil,
+			uq.withTodos != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -399,9 +400,17 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uq.withTodo; query != nil {
-		if err := uq.loadTodo(ctx, query, nodes, nil,
-			func(n *User, e *Todo) { n.Edges.Todo = e }); err != nil {
+	if query := uq.withTodos; query != nil {
+		if err := uq.loadTodos(ctx, query, nodes,
+			func(n *User) { n.Edges.Todos = []*Todo{} },
+			func(n *User, e *Todo) { n.Edges.Todos = append(n.Edges.Todos, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedTodos {
+		if err := uq.loadTodos(ctx, query, nodes,
+			func(n *User) { n.appendNamedTodos(name) },
+			func(n *User, e *Todo) { n.appendNamedTodos(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -413,15 +422,18 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	return nodes, nil
 }
 
-func (uq *UserQuery) loadTodo(ctx context.Context, query *TodoQuery, nodes []*User, init func(*User), assign func(*User, *Todo)) error {
+func (uq *UserQuery) loadTodos(ctx context.Context, query *TodoQuery, nodes []*User, init func(*User), assign func(*User, *Todo)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
 	}
 	query.Where(predicate.Todo(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.TodoColumn, fks...))
+		s.Where(sql.InValues(user.TodosColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -528,6 +540,20 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedTodos tells the query-builder to eager-load the nodes that are connected to the "todos"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedTodos(name string, opts ...func(*TodoQuery)) *UserQuery {
+	query := (&TodoClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedTodos == nil {
+		uq.withNamedTodos = make(map[string]*TodoQuery)
+	}
+	uq.withNamedTodos[name] = query
+	return uq
 }
 
 // UserGroupBy is the group-by builder for User entities.
