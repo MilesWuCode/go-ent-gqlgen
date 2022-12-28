@@ -55,9 +55,6 @@ code ./generate.go
 # 產生相關檔案
 go generate .
 
-# 刪除不必要的檔案
-rm -rf ./graph/model
-
 # 建立main.go
 touch ./main.go
 code ./main.go
@@ -197,4 +194,12 @@ go generate .
 
 # 填加user.resolvers.go裡的todoPages()邏輯
 code ./graph/user.resolvers.go
+
+### 填加 directive @hasRole 功能  ###
+
+# user.graphqls加入enum Role, directive @hasRole
+# 並填加刪除用戶的功能 deleteUser(id: ID!): Boolean! @hasRole(role: OWNER)
+code ./graph/user.graphqls
+go generate .
+
 ```

@@ -14,10 +14,9 @@ exec:
 #   package: graph
 
 # Where should any generated models go?
-# 使用ent所以註解
-# model:
-#   filename: graph/model/models_gen.go
-#   package: model
+model:
+  filename: graph/model/models_gen.go
+  package: model
 
 # Where should the resolver implementations go?
 resolver:

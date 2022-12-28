@@ -1,6 +1,13 @@
+enum Role {
+  OWNER
+}
+
+directive @hasRole(role: Role!) on FIELD_DEFINITION
+
 extend type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean! @hasRole(role: OWNER)
 }
 
 extend type Query {

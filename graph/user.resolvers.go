@@ -22,6 +22,16 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input ent.Upd
 	return r.client.User.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (bool, error) {
+	// 刪除一筆資料
+	if err := r.client.User.DeleteOneID(id).Exec(ctx); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {
 	// 用id查一筆資料
