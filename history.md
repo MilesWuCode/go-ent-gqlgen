@@ -171,4 +171,30 @@ go generate .
 
 # 填加邏輯,查詢單筆/新增/修改...
 code ./graph/user.resolvers.go
+
+### 客製化欄位 ###
+
+# 對User填加firstLetter: String! #gqlgen:resolver
+code ./graph/user.graphqls
+
+# 執行使user.resolvers.go產生FirstLetter()
+go generate .
+
+# 填加FirstLetter()邏輯
+code ./graph/user.resolvers.go
+
+### 查詢user裡的todos並使用分頁功能 ###
+
+# 原本提供
+# ./ent/schema/user.go的Edges()加入Annotations(entgql.RelayConnection())
+code ./ent/schema/user.go
+go generate .
+
+# 自製分頁
+# ./graph/user.graphqls填加todoPages欄位
+code ./graph/user.graphqls
+go generate .
+
+# 填加user.resolvers.go裡的todoPages()邏輯
+code ./graph/user.resolvers.go
 ```

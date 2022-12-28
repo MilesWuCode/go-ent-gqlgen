@@ -8,5 +8,13 @@ extend type Query {
 }
 
 extend type User {
-  firstLetter: String! #gqlgen:resolver
+  firstLetter: String!
+  # 自製分頁
+  todoPages(
+    after: Cursor
+    first: Int
+    before: Cursor
+    last: Int
+    orderBy: TodoOrder
+  ): TodoConnection!
 }

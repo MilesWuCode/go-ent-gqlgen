@@ -71,8 +71,12 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		// O2O
-		edge.To("todos", Todo.Type),
+		// O2M
+		edge.To("todos", Todo.Type).
+			Annotations(
+				// 分頁
+				entgql.RelayConnection(),
+			),
 	}
 }
 

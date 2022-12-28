@@ -34,3 +34,12 @@ func (r *userResolver) FirstLetter(ctx context.Context, obj *ent.User) (string, 
 
 	return string(result[0:1]), nil
 }
+
+// TodoPages is the resolver for the todoPages field.
+func (r *userResolver) TodoPages(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TodoOrder) (*ent.TodoConnection, error) {
+	// 自製分頁
+	return obj.QueryTodos().
+		Paginate(ctx, after, first, before, last,
+			ent.WithTodoOrder(orderBy),
+		)
+}

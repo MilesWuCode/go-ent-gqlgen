@@ -16,14 +16,23 @@ func (t *Todo) User(ctx context.Context) (*User, error) {
 	return result, err
 }
 
-func (u *User) Todos(ctx context.Context) (result []*Todo, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = u.NamedTodos(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = u.Edges.TodosOrErr()
+func (u *User) Todos(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *TodoOrder, where *TodoWhereInput,
+) (*TodoConnection, error) {
+	opts := []TodoPaginateOption{
+		WithTodoOrder(orderBy),
+		WithTodoFilter(where.Filter),
 	}
-	if IsNotLoaded(err) {
-		result, err = u.QueryTodos().All(ctx)
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := u.Edges.totalCount[0][alias]
+	if nodes, err := u.NamedTodos(alias); err == nil || hasTotalCount {
+		pager, err := newTodoPager(opts)
+		if err != nil {
+			return nil, err
+		}
+		conn := &TodoConnection{Edges: []*TodoEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
 	}
-	return result, err
+	return u.QueryTodos().Paginate(ctx, after, first, before, last, opts...)
 }

@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"go-ent-gqlgen/ent"
 	"go-ent-gqlgen/graph/generated"
 )
@@ -43,7 +42,12 @@ func (r *queryResolver) Todos(ctx context.Context, after *ent.Cursor, first *int
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	// panic(fmt.Errorf("not implemented: Users - users"))
+
+	return r.client.User.Query().
+		Paginate(ctx, after, first, before, last,
+			ent.WithUserOrder(orderBy),
+		)
 }
 
 // Query returns generated.QueryResolver implementation.
