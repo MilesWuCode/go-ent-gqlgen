@@ -53,7 +53,7 @@ func (User) Fields() []ent.Field {
 			Comment("更新日期").
 			Annotations(
 				entgql.OrderField("UPDATED_AT"),
-				// 該欄位取消加入註釋,文件有寫但源始碼沒有寫
+				// 該欄位取消加入註釋
 				// entsql.WithComments(false),
 			),
 	}
@@ -86,7 +86,7 @@ func (User) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		// 新增,修改
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		// 全部欄位加入註釋,文件有寫但源始碼沒有寫
+		// 全部欄位加入註釋
 		entsql.WithComments(true),
 	}
 }
