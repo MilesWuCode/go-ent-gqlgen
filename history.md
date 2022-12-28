@@ -78,7 +78,7 @@ code ./graph/todo.graphqls
 # 產生相關檔案,./graph/todo.resolvers.go
 go generate .
 
-# 填加邏輯,查詢單筆/新增/修改
+# 填加邏輯,查詢單筆/新增/修改...
 code ./graph/todo.resolvers.go
 
 # 啓動服務,檢查:查詢單筆/新增/修改的結果
@@ -159,4 +159,16 @@ atlas migrate hash \
 atlas migrate apply \
   --dir "file://ent/migrate/migrations" \
   --url mysql://root:password@localhost:3306/go_ent_gqlgen
+
+# 修改autobind
+code ./gqlgen.yml
+
+# 建立user.graphqls
+code ./graph/user.graphqls
+
+# 產生user.graphqls相關檔案user.resolvers.go
+go generate .
+
+# 填加邏輯,查詢單筆/新增/修改...
+code ./graph/user.resolvers.go
 ```

@@ -46,6 +46,7 @@ resolver:
 autobind:
   - "go-ent-gqlgen/ent"
   - "go-ent-gqlgen/ent/todo"
+  - "go-ent-gqlgen/ent/user"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
