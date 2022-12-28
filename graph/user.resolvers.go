@@ -6,26 +6,31 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"go-ent-gqlgen/ent"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input ent.CreateUserInput) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	// 新增一筆資料
+	client := ent.FromContext(ctx)
+	return client.User.Create().SetInput(input).Save(ctx)
 }
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input ent.UpdateUserInput) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+	// 更新一筆資料
+	return r.client.User.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id int) (*ent.Todo, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {
+	// 用id查一筆資料
+	return r.client.User.Get(ctx, id)
 }
 
 // FirstLetter is the resolver for the firstLetter field.
-func (r *todoResolver) FirstLetter(ctx context.Context, obj *ent.Todo) (string, error) {
-	panic(fmt.Errorf("not implemented: FirstLetter - firstLetter"))
+func (r *userResolver) FirstLetter(ctx context.Context, obj *ent.User) (string, error) {
+	result := []rune(obj.Name)
+
+	return string(result[0:1]), nil
 }

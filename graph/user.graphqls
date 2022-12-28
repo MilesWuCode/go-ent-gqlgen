@@ -4,9 +4,9 @@ extend type Mutation {
 }
 
 extend type Query {
-  user(id: ID!): Todo!
+  user(id: ID!): User!
 }
 
-extend type Todo {
+extend type User {
   firstLetter: String! #gqlgen:resolver
 }
