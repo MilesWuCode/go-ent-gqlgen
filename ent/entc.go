@@ -22,6 +22,8 @@ func main() {
 		entgql.WithConfigPath("gqlgen.yml"),
 		// ?
 		entgql.WithWhereInputs(true),
+		// ?
+		// entgql.WithNodeDescriptor(true),
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)

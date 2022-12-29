@@ -1,13 +1,12 @@
-enum Role {
-  OWNER
-}
-
-directive @hasRole(role: Role!) on FIELD_DEFINITION
+"""
+權限
+"""
+directive @hasPermissions(permissions: [String!]!) on OBJECT | FIELD_DEFINITION
 
 extend type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(id: ID!): Boolean! @hasRole(role: OWNER)
+  deleteUser(id: ID!): Boolean! @hasPermissions(permissions: ["ADMIN"])
 }
 
 extend type Query {

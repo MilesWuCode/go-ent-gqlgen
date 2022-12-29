@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 // User holds the schema definition for the User entity.
@@ -92,5 +93,32 @@ func (User) Annotations() []schema.Annotation {
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		// 全部欄位加入註釋
 		entsql.WithComments(true),
+		// Directives功能,對所有填加@hasPermissions,不太好用
+		// entgql.Directives(
+		// 	HasPermissions([]string{"ADMIN", "OWNER"}),
+		// ),
 	}
+}
+
+// Directives功能,對所有填加@hasPermissions,不太好用
+func HasPermissions(permissions []string) entgql.Directive {
+	children := make(ast.ChildValueList, 0, len(permissions))
+	for _, p := range permissions {
+		children = append(children, &ast.ChildValue{
+			Value: &ast.Value{
+				Raw:  p,
+				Kind: ast.StringValue,
+			},
+		})
+	}
+	return entgql.NewDirective(
+		"hasPermissions",
+		&ast.Argument{
+			Name: "permissions",
+			Value: &ast.Value{
+				Children: children,
+				Kind:     ast.ListValue,
+			},
+		},
+	)
 }

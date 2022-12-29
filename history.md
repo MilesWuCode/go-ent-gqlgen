@@ -195,11 +195,12 @@ go generate .
 # 填加user.resolvers.go裡的todoPages()邏輯
 code ./graph/user.resolvers.go
 
-### 填加 directive @hasRole 功能  ###
+### 填加 directive @hasPermissions 功能  ###
 
-# user.graphqls加入enum Role, directive @hasRole
-# 並填加刪除用戶的功能 deleteUser(id: ID!): Boolean! @hasRole(role: OWNER)
+# 並填加刪除用戶的功能 deleteUser(id: ID!): Boolean! @hasPermissions(permissions: ["ADMIN"])
 code ./graph/user.graphqls
 go generate .
-
+code ./graph/directive.go
+code ./graph/resolver.go
+go generate .
 ```

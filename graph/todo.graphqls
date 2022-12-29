@@ -1,7 +1,7 @@
 extend type Mutation {
   createTodo(input: CreateTodoInput!): Todo!
   updateTodo(id: ID!, input: UpdateTodoInput!): Todo!
-  deleteTodo(id: ID!): Boolean!
+  deleteTodo(id: ID!): Boolean! @hasPermissions(permissions: ["OWNER"])
 }
 
 extend type Query {

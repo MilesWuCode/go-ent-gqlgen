@@ -19,5 +19,9 @@ type Resolver struct{ client *ent.Client }
 func NewSchema(client *ent.Client) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{
 		Resolvers: &Resolver{client},
+		Directives: generated.DirectiveRoot{
+			// 權限
+			HasPermissions: HasPermission(),
+		},
 	})
 }
