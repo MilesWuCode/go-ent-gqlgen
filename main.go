@@ -4,8 +4,6 @@ import (
 	"go-ent-gqlgen/ent"
 	"go-ent-gqlgen/graph"
 	"log"
-	"net/http"
-	"os"
 
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -15,6 +13,7 @@ import (
 	// _ "github.com/mattn/go-sqlite3"
 
 	// mysql
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -46,12 +45,6 @@ func main() {
 	// 	log.Fatal("running schema migration", err)
 	// }
 
-	// 預設埠
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
 	// 建立服務器並注入資料庫連線
 	srv := handler.NewDefaultServer(graph.NewSchema(client))
 
@@ -61,17 +54,37 @@ func main() {
 	// 除錯追蹤,不用可關閉
 	// srv.Use(&debug.Tracer{})
 
-	// GraphQL的Playground介面
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// 原生http,GraphQL的Endpoint
+	// http.Handle("/query", srv)
 
-	// GraphQL的Endpoint
-	http.Handle("/query", srv)
+	// 原生http,GraphQL的Playground介面
+	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+
+	// 預設埠
+	// port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = defaultPort
+	// }
 
 	// 提示
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	// log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	// 開啓服務器並設定埠
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal("http server terminated", err)
-	}
+	// if err := http.ListenAndServe(":"+port, nil); err != nil {
+	// 	log.Fatal("http server terminated", err)
+	// }
+
+	// 使用Gin
+	r := gin.Default()
+
+	r.POST("/query", func(c *gin.Context) {
+		srv.ServeHTTP(c.Writer, c.Request)
+	})
+
+	r.GET("/", func(c *gin.Context) {
+		playground.Handler("GraphQL playground", "/query").
+			ServeHTTP(c.Writer, c.Request)
+	})
+
+	r.Run()
 }
