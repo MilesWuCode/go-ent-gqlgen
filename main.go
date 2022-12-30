@@ -17,8 +17,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const defaultPort = "8080"
-
 func main() {
 	// 使用sqlite在ram
 	// client, err := ent.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
@@ -63,7 +61,7 @@ func main() {
 	// 預設埠
 	// port := os.Getenv("PORT")
 	// if port == "" {
-	// 	port = defaultPort
+	// 	port = 8080
 	// }
 
 	// 提示
